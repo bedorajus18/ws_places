@@ -77,4 +77,41 @@ public function findById(PlaceRepository $placeRepository,$id,NormalizerInterfac
             return $this->json(['status' => 400, 'message' => $e->getMessage()]);
         }
     }
+
+    /* placeliked
+    recupérer 2 id et 2 nb 
+    charger dans les 2 : 1 person avec 1 place / nombre
+    utiliser la method addPlacelikedby 
+    puis sauvegarder. 
+    */
+
+    /**
+     * @Route("/api/place/{idPlace}/liked/{idPerson}", name="api_place_add_liker", methods="POST")
+     */
+    public function likeIt(EntityManagerInterface $entityManager, PlaceRepository $placeRepository, PersonRepository $personRepository, $idPlace, $idPerson)
+    {
+        $place = $placeRepository->find($idPlace);
+        $personne = $personRepository->find($idPerson);
+        $place->addLikedBy($personne);
+        $entityManager->flush();
+        return $this->json($place, 201, [], ['groups' => 'place:read']);
+    
+    /*
+        try{
+            $placeLiker = $serializer->deserialize($id, Place::class, 'json');
+            $errors = $validator->validate($placeLiker);
+            if (count($errors) > 0)
+            {
+                return $this->json($errors, 400);
+            }
+            $entityManager->persist($place);
+            $entityManager->flush();
+            return $this->json($place, 201, [], ['groups' => 'place:read']);
+        }
+        catch (NotEncodableValueException $e)
+        {
+            return $this->json(['status' => 400, 'message' => $e->getMessage()]);
+        } */
+    }
 }
+
